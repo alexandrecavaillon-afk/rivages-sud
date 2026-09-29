@@ -67,8 +67,8 @@ a{color:inherit} button,input,select{font-family:inherit;color:inherit}
 
 /* ---------- ouverture ---------- */
 .hero{position:relative;overflow:hidden;background:linear-gradient(160deg,#C9A27E 0%,#B5655A 45%,#5D2230 100%);color:#fff}
-.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1s}
-.hero img.on{opacity:1}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.6s ease,transform 9s ease-out;transform:scale(1.06)}
+.hero img.on{opacity:1;transform:scale(1)}
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,12,20,.18) 0%,rgba(10,12,20,.28) 45%,rgba(10,12,20,.72) 100%)}
 .hero .in{position:relative;z-index:2;padding-block:clamp(90px,15vw,180px) clamp(36px,5vw,60px);text-align:center}
 .hero h1{color:#fff;font-weight:600;font-size:clamp(58px,12vw,150px);line-height:.95;letter-spacing:-.045em}
@@ -308,7 +308,7 @@ footer .srcs a:hover{text-decoration:underline}
 </header>
 
 <section class="hero" id="top">
-  <img id="heroImg" alt="" referrerpolicy="no-referrer">
+  <div id="heroImgs" aria-hidden="true"></div>
   <div class="in wrap">
     <h1>Sud'perbe<i>.</i></h1>
     <div class="slogan">Vue mer, prix mistral.</div>
@@ -485,7 +485,7 @@ function imgFail(el){const x=PH[el.dataset.id];let i=+el.dataset.i+1;
   if(el.classList.contains("b")){el.remove();return}
   el.remove();const ph=el.closest(".ph");if(ph&&!ph.querySelector("img"))ph.insertAdjacentHTML("beforeend",'<div class="none">Photo sur le site de l\'annonceur</div>')}
 window.imgFail=imgFail;
-const img=(x,i,cls="",eager=false)=>`<img class="${cls}" src="${esc(x.photos[i])}" data-id="${x.id}" data-i="${i}" alt="${esc(x.type+" à "+x.ville)}" ${eager?"":'loading="lazy"'} decoding="async" referrerpolicy="no-referrer" onerror="imgFail(this)"${cls==="b"?` onload="this.classList.add('ok')"`:""}>`;
+const img=(x,i,cls="",eager=false)=>`<img class="${cls}" ${cls==="b"?"data-src":"src"}="${esc(x.photos[i])}" data-id="${x.id}" data-i="${i}" alt="${esc(x.type+" à "+x.ville)}" ${eager?"":'loading="lazy"'} decoding="async" referrerpolicy="no-referrer" onerror="imgFail(this)"${cls==="b"?` onload="this.classList.add('ok')"`:""}>`;
 
 /* ---------- carte d'un bien ---------- */
 function card(x){
@@ -734,6 +734,8 @@ document.getElementById("vList").onclick=()=>setView("liste");
 document.getElementById("vMap").onclick=()=>setView("carte");
 document.querySelectorAll("[data-view]").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();setView(a.dataset.view,true)}));
 const out=document.getElementById("out");
+const hoverLoad=e=>{const c=e.target.closest&&e.target.closest(".card");if(!c)return;const b=c.querySelector("img.b[data-src]");if(b){b.src=b.dataset.src;b.removeAttribute("data-src")}};
+document.addEventListener("pointerover",hoverLoad,{passive:true});
 out.addEventListener("click",e=>{
   const m=e.target.closest("[data-more]");if(m){if(m.dataset.more==="*")st.limit+=48;else st.open[m.dataset.more]=true;render();return}
   if(e.target.closest("a"))return;
@@ -754,10 +756,13 @@ document.getElementById("sort").onchange=e=>{st.sort=e.target.value;reset();rend
 /* ---------- ouverture, chiffres, sources ---------- */
 (function(){
   const withPh=DATA.filter(x=>x.photos.length);
-  const hero=[...withPh].filter(x=>x.source==="Michaël Zingraf"||x.source==="Nice Properties").sort((a,b)=>b.prix-a.prix)[0]||withPh[0];
-  const hi=document.getElementById("heroImg");
-  if(hero){let k=0;hi.onload=()=>hi.classList.add("on");hi.onerror=()=>{k++;if(k<hero.photos.length)hi.src=hero.photos[k];else hi.remove()};hi.src=hero.photos[0];
-    const c=document.getElementById("heroCredit");c.textContent=`${hero.type} à ${hero.ville} · ${eurS(hero.prix)} · voir la fiche`;c.onclick=()=>openFiche(hero.id)}
+  // photos d'ouverture choisies à la main (filigrane discret), sinon les plus beaux biens hors Michaël Zingraf (grand filigrane)
+  const HERO=[20,9,22].map(i=>PH[i]).filter(x=>x&&x.photos.length);
+  const heroes=(HERO.length?HERO:[...withPh].filter(x=>x.source!=="Michaël Zingraf").sort((a,b)=>b.prix-a.prix).slice(0,3));
+  const box=document.getElementById("heroImgs"),cr=document.getElementById("heroCredit");let hk=0;
+  const slides=heroes.map(x=>{const im=new Image();im.alt="";im.referrerPolicy="no-referrer";im.onerror=()=>im.remove();im.onload=()=>{if(!box.querySelector("img.on")){im.classList.add("on");cr.textContent=`${x.type} à ${x.ville} · ${eurS(x.prix)} · voir la fiche`;cr.onclick=()=>openFiche(x.id)}};im.src=x.photos[0];box.appendChild(im);return [im,x]});
+  if(slides.length>1&&!matchMedia("(prefers-reduced-motion:reduce)").matches)setInterval(()=>{const ok=slides.filter(([im])=>im.isConnected&&im.complete&&im.naturalWidth);if(ok.length<2)return;
+    hk=(hk+1)%ok.length;ok.forEach(([im],k)=>im.classList.toggle("on",k===hk));const x=ok[hk][1];cr.textContent=`${x.type} à ${x.ville} · ${eurS(x.prix)} · voir la fiche`;cr.onclick=()=>openFiche(x.id)},6500);
   const p=DATA.map(x=>x.prix),nPh=DATA.reduce((s,x)=>s+x.photos.length,0),cities=new Set(DATA.map(x=>x.ville)).size,news=DATA.filter(x=>x.isNew).length;
   document.getElementById("heroSub").textContent=`${DATA.length} maisons, villas et appartements vue mer en vente, de Menton à Cerbère. Mis à jour le ${BUILT}.`;
   document.getElementById("stats").innerHTML=[[DATA.length,"biens vue mer"],[fr(nPh),"photos"],[eurS(Math.min(...p))+" – "+eurS(Math.max(...p)),"du studio au palais"],[news?news:cities,news?"nouveautés cette semaine":"communes du littoral"]]
