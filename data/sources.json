@@ -1,0 +1,139 @@
+{
+ "bloques": [
+  "SeLoger",
+  "Leboncoin",
+  "Bien’ici",
+  "Belles Demeures",
+  "Green-Acres",
+  "Cap Immobilier",
+  "Barnes Côte d’Azur",
+  "PAP (annonces expirées)"
+ ],
+ "sources": [
+  {
+   "site": "Nice Properties",
+   "pages": [
+    "https://www.nice-properties.com/buy-sale-sea-view-villa-french-riviera-s29"
+   ],
+   "note": "Aussi la catégorie appartements vue mer du même site (à retrouver et ajouter ici)."
+  },
+  {
+   "site": "Michaël Zingraf",
+   "pages": [
+    "https://www.michaelzingraf.com/en/for-sale/sea-view-villas-french-riviera"
+   ],
+   "note": "Rubrique vue mer, environ 315 biens triés par prix. Chercher un tri par date si le site le propose."
+  },
+  {
+   "site": "John Taylor",
+   "pages": [],
+   "accueil": "https://www.john-taylor.fr",
+   "note": "Pages de résultats vente vue mer Côte d’Azur, Saint-Tropez, Sainte-Maxime, Marseille : à retrouver au premier passage puis à noter ici."
+  },
+  {
+   "site": "Côte d’Azur Sotheby’s International Realty",
+   "pages": [],
+   "accueil": "https://www.cotedazur-sothebysrealty.com",
+   "note": "Page de résultats vue mer à retrouver."
+  },
+  {
+   "site": "Carlton International",
+   "pages": [],
+   "accueil": "https://www.carlton-international.com",
+   "note": "Page de résultats vue mer à retrouver."
+  },
+  {
+   "site": "Côte & Littoral",
+   "pages": [
+    "https://www.cotelittoral.fr/vente-maisons-bord-de-mer-cote-d-azur-283_6.html"
+   ],
+   "accueil": "https://www.cotelittoral.fr",
+   "note": "Ajouter les pages Var, Bouches-du-Rhône, Languedoc-Roussillon, Hérault, Pyrénées-Orientales. Le site met l’étiquette « Bord de mer » partout : exiger « vue mer » dans le texte."
+  },
+  {
+   "site": "Le Site Immo",
+   "pages": [
+    "https://www.lesiteimmo.com/acheter/maison-vue-mer/occitanie",
+    "https://www.lesiteimmo.com/acheter/maison-vue-mer/provence-alpes-cote-d-azur",
+    "https://www.lesiteimmo.com/acheter/appartement-vue-mer/occitanie"
+   ],
+   "note": "Plusieurs pages de résultats (page 2, 3…)."
+  },
+  {
+   "site": "EtreProprio",
+   "pages": [
+    "https://www.etreproprio.com/agde/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/sete/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/port-vendres/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/banyuls-sur-mer/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/la-grande-motte/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/collioure/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/argeles-sur-mer/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/le-grau-du-roi/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/palavas-les-flots/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/canet-en-roussillon/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/valras-plage/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/frontignan/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/gruissan/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/le-lavandou/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/saint-raphael/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/cavalaire-sur-mer/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/six-fours-les-plages/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/carry-le-rouet/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/la-croix-valmer/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/sanary-sur-mer/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/ramatuelle/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/toulon/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/martigues/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/frejus/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/sainte-maxime/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/menton/maison-avec-vue-sur-mer",
+    "https://www.etreproprio.com/marseille/maison-avec-vue-sur-mer"
+   ],
+   "note": "Certaines villes renvoient une erreur 404 ou des annonces hors sujet : les retirer de la liste. Le nom de l’agence d’origine va dans le champ agence."
+  },
+  {
+   "site": "Nestenn",
+   "pages": [],
+   "accueil": "https://nestenn.com",
+   "note": "Recherches Hyères, La Ciotat, Toulon, Saint-Raphaël."
+  },
+  {
+   "site": "Castellas Immobilier",
+   "pages": [],
+   "accueil": "https://www.castellas-immobilier.com",
+   "note": "Cassis."
+  },
+  {
+   "site": "Agence du Regard",
+   "pages": [],
+   "accueil": "https://www.agenceduregard.fr",
+   "note": "Hyères, Giens."
+  },
+  {
+   "site": "Leggett Immobilier",
+   "pages": [],
+   "accueil": "https://www.leggett-immo.com",
+   "note": "Rubrique vues sur la mer, Occitanie."
+  },
+  {
+   "site": "Mer et Demeures",
+   "pages": [],
+   "accueil": "https://www.meretdemeures.com",
+   "note": "Leucate."
+  },
+  {
+   "site": "Les Clefs de chez moi",
+   "pages": [],
+   "accueil": "https://www.lesclefsdechezmoi.fr",
+   "note": "Cerbère, Narbonne-Plage, Port-la-Nouvelle, Saint-Cyprien, Valras."
+  },
+  {
+   "site": "Agence PY",
+   "pages": [
+    "https://www.agence-py.fr/vente/1"
+   ],
+   "note": "Collioure. Les pages de détail ne se lisent pas : se contenter des vignettes de la liste."
+  }
+ ]
+}
