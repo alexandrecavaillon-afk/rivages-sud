@@ -748,9 +748,12 @@ function addBase(m){
     if(!m._container)return;
     if(!ok){osm().addTo(m);return}
     const lay=L.maplibreGL({style:OFM+(isDark()?"dark":"positron"),attribution:ATTR_OFM});lay.addTo(m);bases.push([m,lay]);
-    const gl=lay.getMaplibreMap&&lay.getMaplibreMap();let ready=false;
-    if(gl)gl.once("load",()=>ready=true);
-    setTimeout(()=>{if(!ready&&m._container){m.removeLayer(lay);osm().addTo(m)}},9000);
+    const gl=lay.getMaplibreMap&&lay.getMaplibreMap();let ready=false,fell=false;
+    const fall=()=>{if(fell||ready||!m._container)return;fell=true;try{m.removeLayer(lay)}catch(e){}osm().addTo(m)};
+    if(gl){gl.once("styledata",()=>ready=true);gl.once("load",()=>ready=true);
+      gl.on("error",e=>{if(!ready&&!(e&&e.sourceId))fall()})}  // erreur du style lui-même (pas d'une tuile)
+    const check=()=>{if(ready||fell)return;if(document.visibilityState!=="visible"){document.addEventListener("visibilitychange",()=>setTimeout(check,6000),{once:true});return}if(gl&&gl.isStyleLoaded())ready=true;else fall()};
+    setTimeout(check,12000);
   });
 }
 function restyle(){bases.forEach(([m,l])=>{try{if(m._container&&l.getMaplibreMap)l.getMaplibreMap().setStyle(OFM+(isDark()?"dark":"positron"))}catch(e){}})}
