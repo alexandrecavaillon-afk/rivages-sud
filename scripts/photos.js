@@ -4,7 +4,10 @@
 // puis affiche en JSON les adresses des grandes images de l'annonce (hors logos et « annonces similaires »).
 // Respecte le fichier robots.txt du site : si la page y est interdite, rien n'est ouvert.
 const url = process.argv[2];
-if (!/^https?:\/\//.test(url || '')) { console.error('Usage : node scripts/photos.js URL'); process.exit(1); }
+// Uniquement des pages web publiques : pas de fichiers locaux, pas d'adresses internes (localhost, réseau privé, métadonnées du serveur).
+const PRIVE = h => /^(localhost|.*\.local|.*\.internal|metadata\.google\.internal)$/i.test(h) || /^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[|::1)/.test(h) || /^\d+$/.test(h);
+const publique = u => { try { const p = new URL(u); return /^https?:$/.test(p.protocol) && p.hostname.includes('.') && !PRIVE(p.hostname); } catch (e) { return false; } };
+if (!publique(url || '')) { console.error('Usage : node scripts/photos.js https://site-public/annonce'); process.exit(1); }
 
 async function allowedByRobots(u) {
   try {
@@ -31,6 +34,7 @@ async function allowedByRobots(u) {
   const browser = await chromium.launch();
   try {
     const page = await browser.newPage({ viewport: { width: 1366, height: 900 }, locale: 'fr-FR' });
+    await page.route('**/*', r => publique(r.request().url()) || /^(data|blob):/.test(r.request().url()) ? r.continue() : r.abort());
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForTimeout(5000);
     for (let y = 0; y < 12000; y += 800) { await page.evaluate(v => window.scrollTo(0, v), y); await page.waitForTimeout(250); }
