@@ -122,7 +122,9 @@ jobs:
 
       - name: Vérifier et intégrer les données
         run: |
-          if ! node scripts/verifier.js --avant /tmp/avant.json; then
+          # un essai de photos ne compte que si Claude a travaillé pendant ce passage
+          PASSAGE=""; if [ -f /tmp/entree/nouveaux.json ] || [ -f /tmp/entree/changements.json ]; then PASSAGE="--passage-claude"; fi
+          if ! node scripts/verifier.js --avant /tmp/avant.json $PASSAGE; then
             echo "::warning::Données refusées par le garde-fou : on garde la version précédente."
             git checkout -- data/
             node scripts/verifier.js
