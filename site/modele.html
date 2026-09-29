@@ -77,7 +77,7 @@ a{color:inherit} button,input,select{font-family:inherit;color:inherit}
 .stat .l{font-family:var(--serif);color:var(--wine);font-size:15px}
 
 /* ---------- filtres ---------- */
-.filters{background:var(--cream);border-bottom:1px solid var(--line);z-index:40}
+.filters{position:relative;background:var(--cream);border-bottom:1px solid var(--line);z-index:40}
 @media (min-width:900px){.filters{position:sticky;top:calc(env(safe-area-inset-top,0px) + 64px)}}
 .filters .wrap{display:flex;flex-direction:column;gap:10px;padding-block:14px}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -107,6 +107,56 @@ select{appearance:none;height:40px;border:1px solid var(--line);background:var(-
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--cream)}
 .count{margin-left:auto;font-size:13.5px;color:var(--muted);white-space:nowrap}
 .clear{border:0;background:none;color:var(--coral);font-weight:600;font-size:13.5px;cursor:pointer;padding:6px}
+
+
+/* boutons de filtre et panneaux */
+.fpills{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fp{height:40px;border:1px solid var(--line);background:var(--shell);border-radius:100px;padding:0 14px 0 16px;display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;white-space:nowrap;transition:.15s}
+.fp svg{width:14px;height:14px;transition:transform .2s;color:var(--muted)}
+.fp:hover{border-color:var(--ink)}
+.fp[aria-expanded="true"] svg{transform:rotate(180deg)}
+.fp.on{background:var(--ink);border-color:var(--ink);color:var(--cream)}
+.fp.on svg{color:var(--cream)}
+.fp .n{background:var(--coral);color:#fff;font-size:11.5px;font-weight:800;min-width:20px;height:20px;padding:0 6px;border-radius:100px;display:inline-flex;align-items:center;justify-content:center}
+.fp.sort{margin-left:auto;background:transparent}
+.fsum{font-size:13.5px;color:var(--muted);white-space:nowrap}
+.pop{position:absolute;z-index:80;background:var(--shell);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-up);width:min(340px,calc(100vw - 32px));display:flex;flex-direction:column;max-height:min(72vh,640px)}
+.pop.wide{width:min(760px,calc(100vw - 32px))}
+.pop .ph2{display:flex;justify-content:space-between;align-items:baseline;padding:18px 20px 6px}
+.pop .ph2 h3{font-size:19px;letter-spacing:-.02em}
+.pop .ph2 h3::after{content:".";color:var(--coral)}
+.pop .ph2 span{font-family:var(--serif);color:var(--wine);font-size:14px}
+.pbody{overflow:auto;padding:6px 20px 12px;overscroll-behavior:contain}
+.pgroup{margin-top:14px}
+.pgroup:first-child{margin-top:4px}
+.pgroup h4{margin:0 0 8px;font-family:var(--serif);font-weight:400;font-size:16px;color:var(--wine)}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:4px 14px}
+.opt{display:flex;align-items:center;gap:10px;padding:8px 8px;border-radius:10px;cursor:pointer;font-size:14.5px;color:var(--ink);min-width:0}
+.opt:hover{background:var(--sand)}
+.opt input{appearance:none;width:20px;height:20px;border:1.5px solid var(--muted);border-radius:6px;flex:none;display:grid;place-content:center;margin:0;cursor:pointer;background:var(--shell)}
+.opt input[type=radio]{border-radius:50%}
+.opt input:checked{background:var(--coral);border-color:var(--coral)}
+.opt input:checked::after{content:"";width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:translateY(-1px) rotate(-45deg)}
+.opt input[type=radio]:checked::after{width:8px;height:8px;border:0;border-radius:50%;background:#fff;transform:none}
+.opt .ico svg{width:17px;height:17px;color:var(--coral);display:block}
+.opt .lb2{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opt small{color:var(--muted);font-size:12.5px}
+.opt.off{opacity:.4}
+.pfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 20px;border-top:1px solid var(--line)}
+.pfoot .clr{border:0;background:none;font-weight:600;font-size:14px;color:var(--text);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 0}
+.pfoot .go{flex:none;height:44px;border:0;border-radius:100px;background:var(--coral);color:var(--coral-ink);font-weight:700;font-size:14.5px;padding:0 20px;cursor:pointer}
+.popback{position:fixed;inset:0;z-index:79;background:transparent}
+@media (max-width:600px){
+  .pop,.pop.wide{position:fixed;left:0!important;right:0;bottom:0;top:auto!important;width:100%;max-height:82vh;border-radius:20px 20px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .popback{background:var(--veil)}
+  .fpills{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  .fpills::-webkit-scrollbar{display:none}
+  .fp.sort{margin-left:0}
+  .pgrid{grid-template-columns:1fr 1fr}
+  .opt{align-items:flex-start;padding:9px 6px;gap:8px;font-size:14px}
+  .opt .lb2{white-space:normal;line-height:1.3}
+  .opt .ico{display:none}
+}
 
 /* ---------- résultats ---------- */
 main{padding-block:28px 60px}
@@ -290,7 +340,7 @@ footer .srcs a:hover{text-decoration:underline}
     <nav class="nav" aria-label="Navigation">
       <a href="#biens" data-view="liste">Les biens</a>
       <a href="#carte" data-view="carte">La carte</a>
-      <a href="#filtres">Équipements</a>
+      <a href="#filtres" id="navOpts">Options</a>
       <a href="#sources">Sources</a>
     </nav>
     <button class="tbtn" id="theme" type="button" aria-label="Changer le thème"></button>
@@ -322,39 +372,11 @@ footer .srcs a:hover{text-decoration:underline}
         <button type="button" id="vList" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Liste</button>
         <button type="button" id="vMap" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Carte</button>
       </div>
-      <select id="sort" aria-label="Classer">
-        <option value="type">Classer par type</option>
-        <option value="recent">Les plus récents</option>
-        <option value="price-desc">Prix décroissant</option>
-        <option value="price-asc">Prix croissant</option>
-        <option value="surface-desc">Surface décroissante</option>
-        <option value="surface-asc">Surface croissante</option>
-        <option value="ppm-asc">Prix au m² croissant</option>
-        <option value="land-desc">Plus grand terrain</option>
-        <option value="drop">Baisses de prix</option>
-      </select>
     </div>
-    <div class="scroll" id="types"></div>
-    <div class="row">
-      <div class="scroll" id="zones" style="flex:1 1 auto;min-width:0"></div>
-      <select id="budget" aria-label="Budget">
-        <option value="">Tous budgets</option>
-        <option value="0-500000">Moins de 500 k€</option>
-        <option value="500000-1000000">500 k€ – 1 M€</option>
-        <option value="1000000-2000000">1 – 2 M€</option>
-        <option value="2000000-5000000">2 – 5 M€</option>
-        <option value="5000000-15000000">5 – 15 M€</option>
-        <option value="15000000-999000000">Plus de 15 M€</option>
-      </select>
-      <select id="beds" aria-label="Chambres">
-        <option value="0">Chambres</option>
-        <option value="1">1 et +</option><option value="2">2 et +</option><option value="3">3 et +</option>
-        <option value="4">4 et +</option><option value="5">5 et +</option><option value="7">7 et +</option>
-      </select>
-    </div>
-    <div class="scroll" id="eqs" aria-label="Équipements"></div>
-    <div class="row"><span class="count" id="count" aria-live="polite"></span></div>
+    <div class="fpills" id="fpills"></div>
   </div>
+  <div class="popback" id="popback" hidden></div>
+  <div class="pop" id="pop" role="dialog" aria-modal="false" hidden></div>
 </section>
 
 <main class="wrap" id="biens">
@@ -502,15 +524,26 @@ function card(x){
 }
 
 /* ---------- état, filtres ---------- */
-const st={type:"Tous",zone:"Toutes",q:"",budget:"",beds:0,eq:new Set(),sort:"type",view:"liste",open:{},limit:48,allEq:false};
+const st={types:new Set(),zones:new Set(),q:"",budget:"",beds:0,eq:new Set(),sort:"type",view:"liste",open:{},limit:48};
+const BUDGETS=[["","Tous les budgets"],["0-500000","Moins de 500 000 €"],["500000-1000000","500 000 € à 1 M€"],["1000000-2000000","1 à 2 M€"],["2000000-5000000","2 à 5 M€"],["5000000-15000000","5 à 15 M€"],["15000000-999000000","Plus de 15 M€"]];
+const BEDS=[[0,"Peu importe"],[1,"1 chambre et +"],[2,"2 chambres et +"],[3,"3 chambres et +"],[4,"4 chambres et +"],[5,"5 chambres et +"],[7,"7 chambres et +"]];
+const SORTS=[["type","Par type de bien"],["recent","Les plus récents"],["price-desc","Prix décroissant"],["price-asc","Prix croissant"],["surface-desc","Surface décroissante"],["surface-asc","Surface croissante"],["ppm-asc","Prix au m² croissant"],["land-desc","Plus grand terrain"],["drop","Baisses de prix"]];
+const OPT_GROUPS=[
+  ["La mer",["pieds dans l'eau","accès plage","vue panoramique","vue sur les îles","coucher de soleil","ponton","anneau de port"]],
+  ["Extérieurs",["piscine","piscine chauffée","jardin","terrasse","toit-terrasse","balcon","pool house","maison d'amis"]],
+  ["Confort",["climatisation","ascenseur","cheminée","cuisine équipée","dressing","cave","meublé","plain-pied","domotique"]],
+  ["Bien-être et loisirs",["spa","sauna","hammam","salle de sport","tennis"]],
+  ["Stationnement et sécurité",["garage","parking","résidence sécurisée","gardien","alarme"]],
+  ["État et environnement",["neuf","rénové","à rénover","calme","panneaux solaires","arrosage automatique"]]];
 function list(skip){
   const words=nz(st.q).trim().split(/\s+/).filter(Boolean);
+  const [bmin,bmax]=st.budget?st.budget.split("-").map(Number):[0,Infinity];
   return DATA.filter(x=>
-    (skip==="type"||st.type==="Tous"||x.type===st.type)&&
-    (skip==="zone"||st.zone==="Toutes"||x.zone===st.zone)&&
+    (skip==="type"||!st.types.size||st.types.has(x.type))&&
+    (skip==="zone"||!st.zones.size||st.zones.has(x.zone))&&
     (!words.length||words.every(w=>x.hay.includes(w)))&&
-    (!st.budget||(()=>{const[a,b]=st.budget.split("-").map(Number);return x.prix>=a&&x.prix<b})())&&
-    (!st.beds||(x.chambres||0)>=st.beds)&&
+    (skip==="budget"||(x.prix>=bmin&&x.prix<bmax))&&
+    (skip==="beds"||!st.beds||(x.chambres||0)>=st.beds)&&
     (skip==="eq"||[...st.eq].every(k=>x.eq.includes(k))));
 }
 function sorted(a){
@@ -521,25 +554,86 @@ function sorted(a){
     type:(p,q)=>(TYPE_ORDER.indexOf(p.type)-TYPE_ORDER.indexOf(q.type))||q.prix-p.prix};
   return a.slice().sort(f[st.sort]);
 }
-function chips(){
-  const bt=list("type"),bz=list("zone"),be=list("eq");
-  document.getElementById("types").innerHTML='<span class="lab">Type</span>'+["Tous",...TYPE_ORDER.filter(t=>DATA.some(d=>d.type===t))].map(t=>{
-    const n=t==="Tous"?bt.length:bt.filter(x=>x.type===t).length;
-    return `<button class="chip" type="button" data-type="${t}" aria-pressed="${t===st.type}">${t==="Tous"?"Tous les biens":PLURAL[t]}<small>${n}</small></button>`}).join("");
-  document.getElementById("zones").innerHTML='<span class="lab">Zone</span>'+["Toutes",...ZONES].map(z=>{
-    const n=z==="Toutes"?bz.length:bz.filter(x=>x.zone===z).length;
-    return `<button class="chip" type="button" data-zone="${z}" aria-pressed="${z===st.zone}">${z==="Toutes"?"Toute la côte":z}<small>${n}</small></button>`}).join("");
-  const eqs=EQ_ORDER.map(k=>[k,be.filter(x=>x.eq.includes(k)).length]).filter(([k,n])=>n||st.eq.has(k));
-  const shown=st.allEq?eqs:eqs.slice(0,14);
-  document.getElementById("eqs").innerHTML='<span class="lab">Équipements</span>'+shown.map(([k,n])=>`<button class="chip eq" type="button" data-eq="${esc(k)}" aria-pressed="${st.eq.has(k)}">${eqIcon(k)}${esc(cap(k))}<small>${n}</small></button>`).join("")
-    +(eqs.length>14?`<button class="chip" type="button" data-alleq="1">${st.allEq?"Moins":"+ "+(eqs.length-14)+" autres"}</button>`:"");
+const CHEV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>';
+let popKind=null;
+function pillLabel(k){
+  if(k==="type"){const n=st.types.size;return n===1?PLURAL[[...st.types][0]]:n?"Types":"Type"}
+  if(k==="zone"){const n=st.zones.size;return n===1?[...st.zones][0]:n?"Zones":"Zone"}
+  if(k==="budget")return st.budget?BUDGETS.find(b=>b[0]===st.budget)[1]:"Budget";
+  if(k==="beds")return st.beds?st.beds+" ch. et +":"Chambres";
+  if(k==="opts")return "Options";
+  if(k==="sort")return "Trier : "+SORTS.find(x=>x[0]===st.sort)[1].toLowerCase();
 }
+function pillCount(k){return k==="type"&&st.types.size>1?st.types.size:k==="zone"&&st.zones.size>1?st.zones.size:k==="opts"?st.eq.size:0}
+function pillOn(k){return k==="type"?st.types.size>0:k==="zone"?st.zones.size>0:k==="budget"?!!st.budget:k==="beds"?st.beds>0:k==="opts"?st.eq.size>0:false}
+function anyFilter(){return st.types.size||st.zones.size||st.q||st.budget||st.beds||st.eq.size}
+function chips(n){
+  const el=document.getElementById("fpills");
+  el.innerHTML=["type","zone","budget","beds","opts"].map(k=>{const c=pillCount(k);
+    return `<button class="fp${pillOn(k)?" on":""}" type="button" data-pop="${k}" aria-haspopup="dialog" aria-expanded="${popKind===k}">${esc(pillLabel(k))}${c?`<span class="n">${c}</span>`:""}${CHEV}</button>`}).join("")
+    +`<span class="fsum" id="count" aria-live="polite">${n?n+" bien"+(n>1?"s":""):"Aucun bien"}${anyFilter()?' · <button class="clear" type="button" id="clearAll">Tout effacer</button>':""}</span>`
+    +`<button class="fp sort" type="button" data-pop="sort" aria-haspopup="dialog" aria-expanded="${popKind==="sort"}">${esc(pillLabel("sort"))}${CHEV}</button>`;
+}
+/* ---------- panneaux de choix ---------- */
+const pop=document.getElementById("pop"),popback=document.getElementById("popback");
+const optRow=(type,name,val,checked,label,n,icon)=>`<label class="opt${n===0&&!checked?" off":""}"><input type="${type}" name="${name}" value="${esc(val)}"${checked?" checked":""}>${icon?`<span class="ico">${icon}</span>`:""}<span class="lb2">${esc(label)}</span>${n!=null?`<small class="tnum">${n}</small>`:""}</label>`;
+function popHTML(k){
+  let title="",sub="",body="",wide=false;
+  if(k==="type"){const b=list("type");title="Type de bien";sub="plusieurs choix possibles";
+    body=`<div class="pgrid" style="grid-template-columns:1fr">${TYPE_ORDER.filter(t=>DATA.some(d=>d.type===t)).map(t=>optRow("checkbox","type",t,st.types.has(t),PLURAL[t],b.filter(x=>x.type===t).length)).join("")}</div>`}
+  if(k==="zone"){const b=list("zone");title="Zone";sub="plusieurs choix possibles";
+    const Z={"Côte d'Azur":"Alpes-Maritimes (06)","Var":"Var (83)","Provence":"Bouches-du-Rhône (13)","Occitanie":"Gard, Hérault, Aude, Pyrénées-Orientales"};
+    body=`<div class="pgrid" style="grid-template-columns:1fr">${ZONES.map(z=>optRow("checkbox","zone",z,st.zones.has(z),z+" · "+Z[z],b.filter(x=>x.zone===z).length)).join("")}</div>`}
+  if(k==="budget"){const b=list("budget");title="Budget";
+    body=`<div class="pgrid" style="grid-template-columns:1fr">${BUDGETS.map(([v,l])=>{const[a,c]=v?v.split("-").map(Number):[0,Infinity];return optRow("radio","budget",v,st.budget===v,l,b.filter(x=>x.prix>=a&&x.prix<c).length)}).join("")}</div>`}
+  if(k==="beds"){const b=list("beds");title="Chambres";
+    body=`<div class="pgrid" style="grid-template-columns:1fr">${BEDS.map(([v,l])=>optRow("radio","beds",v,st.beds===v,l,b.filter(x=>!v||(x.chambres||0)>=v).length)).join("")}</div>`}
+  if(k==="opts"){const b=list("eq");wide=true;title="Options";sub="le bien doit tout avoir";
+    const total=o=>DATA.filter(x=>x.eq.includes(o)).length;
+    body=OPT_GROUPS.map(([g,keys])=>{const ks=keys.filter(o=>total(o)||st.eq.has(o));if(!ks.length)return"";
+      return `<div class="pgroup"><h4>${g}</h4><div class="pgrid">${ks.map(o=>optRow("checkbox","eq",o,st.eq.has(o),cap(o),b.filter(x=>x.eq.includes(o)&&[...st.eq].every(e=>x.eq.includes(e))).length,eqIcon(o))).join("")}</div></div>`}).join("")}
+  if(k==="sort"){title="Trier";
+    body=`<div class="pgrid" style="grid-template-columns:1fr">${SORTS.map(([v,l])=>optRow("radio","sort",v,st.sort===v,l,null)).join("")}</div>`}
+  const n=list().length;
+  pop.classList.toggle("wide",wide);
+  pop.innerHTML=`<div class="ph2"><h3>${title}</h3>${sub?`<span>${sub}</span>`:""}</div><div class="pbody">${body}</div>
+    <div class="pfoot">${k==="sort"?"<span></span>":`<button class="clr" type="button" data-clr="${k}">Effacer</button>`}<button class="go" type="button" data-close="1">${n?"Voir "+n+" bien"+(n>1?"s":""):"Aucun bien"}</button></div>`;
+}
+function placePop(btn){
+  if(innerWidth<=600){pop.style.left="";pop.style.top="";return}
+  const host=document.getElementById("filtres").getBoundingClientRect(),r=btn.getBoundingClientRect();
+  const w=pop.offsetWidth;let left=r.left-host.left;if(left+w>host.width-16)left=Math.max(16,r.right-host.left-w);
+  pop.style.left=left+"px";pop.style.top=(r.bottom-host.top+8)+"px";
+}
+function openPop(k){
+  if(popKind===k)return closePop();
+  popKind=k;popHTML(k);pop.hidden=false;popback.hidden=false;chips(list().length);
+  const btn=document.querySelector(`[data-pop="${k}"]`);placePop(btn);
+  const first=pop.querySelector("input");if(first&&innerWidth>600)first.focus({preventScroll:true});
+}
+function closePop(){if(!popKind)return;const k=popKind;popKind=null;pop.hidden=true;popback.hidden=true;chips(list().length);const b=document.querySelector(`[data-pop="${k}"]`);if(b)b.focus({preventScroll:true})}
+function refreshPop(){if(!popKind)return;const sc=pop.querySelector(".pbody").scrollTop;popHTML(popKind);pop.querySelector(".pbody").scrollTop=sc}
+pop.addEventListener("change",e=>{const i=e.target;if(!i.name)return;
+  if(i.name==="type"){i.checked?st.types.add(i.value):st.types.delete(i.value)}
+  if(i.name==="zone"){i.checked?st.zones.add(i.value):st.zones.delete(i.value)}
+  if(i.name==="eq"){i.checked?st.eq.add(i.value):st.eq.delete(i.value)}
+  if(i.name==="budget")st.budget=i.value;
+  if(i.name==="beds")st.beds=+i.value;
+  if(i.name==="sort")st.sort=i.value;
+  reset();render();refreshPop();
+  if(i.name==="sort")closePop();
+});
+pop.addEventListener("click",e=>{
+  const c=e.target.closest("[data-clr]");if(c){const k=c.dataset.clr;if(k==="type")st.types.clear();if(k==="zone")st.zones.clear();if(k==="budget")st.budget="";if(k==="beds")st.beds=0;if(k==="opts")st.eq.clear();reset();render();refreshPop();return}
+  if(e.target.closest("[data-close]")){closePop();document.getElementById("biens").scrollIntoView({behavior:"smooth",block:"start"})}
+});
+popback.addEventListener("click",closePop);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&popKind){e.preventDefault();closePop()}});
+addEventListener("resize",()=>{if(popKind)placePop(document.querySelector(`[data-pop="${popKind}"]`))});
 let lastList=[];
 function render(){
-  chips();
   const a=sorted(list());lastList=a;
-  const f=[st.type!=="Tous",st.zone!=="Toutes",!!st.q,!!st.budget,!!st.beds,st.eq.size>0].some(Boolean);
-  document.getElementById("count").innerHTML=`${a.length} bien${a.length>1?"s":""}${f?' · <button class="clear" type="button" id="clearAll">Tout effacer</button>':""}`;
+  chips(a.length);
   if(st.view==="carte"){drawMap(a);return}
   const out=document.getElementById("out");
   if(!a.length){out.innerHTML=`<div class="empty"><h3>Aucun bien ne correspond</h3><p>Retirez un équipement, élargissez le budget ou changez de zone.</p></div>`;return}
@@ -703,7 +797,7 @@ function showSugg(){const q=nz(qi.value).trim();if(q.length<2){sg.hidden=true;qi
   sg.hidden=false;qi.setAttribute("aria-expanded","true")}
 function pick(i){const s=sItems[i];if(!s)return;
   if(s.kind==="Équipement"){st.eq.add(nz(s.label)===nz("pieds dans l'eau")?"pieds dans l'eau":EQ_ORDER.find(k=>nz(k)===nz(s.label))||s.label.toLowerCase());qi.value="";st.q=""}
-  else if(s.kind==="Zone"){st.zone=s.label;qi.value="";st.q=""}
+  else if(s.kind==="Zone"){st.zones=new Set([s.label]);qi.value="";st.q=""}
   else{qi.value=s.label;st.q=s.label}
   sg.hidden=true;reset();render()}
 qi.addEventListener("input",()=>{st.q=qi.value;reset();render();showSugg()});
@@ -732,16 +826,11 @@ out.addEventListener("click",e=>{
   const c=e.target.closest(".card");if(c)openFiche(c.dataset.id);
 });
 document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("card")){e.preventDefault();openFiche(e.target.dataset.id)}});
-document.getElementById("filtres").addEventListener("click",e=>{
-  const t=e.target.closest("[data-type]");if(t){st.type=t.dataset.type;reset();return render()}
-  const z=e.target.closest("[data-zone]");if(z){st.zone=z.dataset.zone;reset();return render()}
-  const q=e.target.closest("[data-eq]");if(q){const k=q.dataset.eq;st.eq.has(k)?st.eq.delete(k):st.eq.add(k);reset();return render()}
-  if(e.target.closest("[data-alleq]")){st.allEq=!st.allEq;return chips()}
-  if(e.target.closest("#clearAll")){Object.assign(st,{type:"Tous",zone:"Toutes",q:"",budget:"",beds:0});st.eq.clear();qi.value="";document.getElementById("budget").value="";document.getElementById("beds").value="0";reset();render()}
+document.getElementById("navOpts").addEventListener("click",e=>{e.preventDefault();document.getElementById("filtres").scrollIntoView({behavior:"smooth"});setTimeout(()=>openPop("opts"),450)});
+document.getElementById("fpills").addEventListener("click",e=>{
+  const p=e.target.closest("[data-pop]");if(p){openPop(p.dataset.pop);return}
+  if(e.target.closest("#clearAll")){st.types.clear();st.zones.clear();st.eq.clear();Object.assign(st,{q:"",budget:"",beds:0});qi.value="";closePop();reset();render()}
 });
-document.getElementById("budget").onchange=e=>{st.budget=e.target.value;reset();render()};
-document.getElementById("beds").onchange=e=>{st.beds=+e.target.value;reset();render()};
-document.getElementById("sort").onchange=e=>{st.sort=e.target.value;reset();render()};
 
 /* ---------- ouverture, chiffres, sources ---------- */
 (function(){
