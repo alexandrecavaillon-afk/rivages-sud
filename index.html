@@ -255,7 +255,7 @@ main{padding-block:28px 60px}
 .empty h3{font-size:24px;margin-bottom:8px}
 
 /* ---------- carte ---------- */
-#mapWrap{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
+#mapWrap{position:relative;z-index:0;isolation:isolate;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
 #map{height:min(74vh,760px);min-height:420px;background:var(--sand)}
 .mapnote{font-size:12.5px;color:var(--muted);margin-top:10px;font-family:var(--serif)}
 .pm{background:none;border:0}
@@ -266,11 +266,11 @@ main{padding-block:28px 60px}
 .leaflet-popup-content-wrapper{border-radius:14px;padding:0;overflow:hidden;background:var(--shell);color:var(--text)}
 .leaflet-popup-tip{background:var(--shell)}
 .leaflet-popup-content{margin:0;width:240px!important}
-.pop img{display:block;width:100%;height:140px;object-fit:cover;background:var(--sand)}
-.pop .t{padding:10px 12px 12px}
-.pop b{font-size:17px;color:var(--ink)}
-.pop .c{font-family:var(--serif);font-size:15px;color:var(--ink)}
-.pop button{margin-top:8px;width:100%;height:34px;border:0;border-radius:100px;background:var(--ink);color:var(--cream);font-weight:700;cursor:pointer}
+.mpop img{display:block;width:100%;height:140px;object-fit:cover;background:var(--sand)}
+.mpop .t{padding:10px 12px 12px}
+.mpop b{font-size:17px;color:var(--ink)}
+.mpop .c{font-family:var(--serif);font-size:15px;color:var(--ink)}
+.mpop button{margin-top:8px;width:100%;height:34px;border:0;border-radius:100px;background:var(--ink);color:var(--cream);font-weight:700;cursor:pointer}
 .leaflet-container{font-family:var(--display)}
 .leaflet-control-attribution{font-size:10px}
 
@@ -325,7 +325,7 @@ dialog.fiche[open]{display:flex;flex-direction:column;animation:up .3s cubic-bez
 .dpe{display:flex;gap:4px;margin-top:6px}
 .dpe span{flex:1;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;opacity:.28}
 .dpe span.on{opacity:1;transform:scaleY(1.15);box-shadow:0 3px 10px rgba(0,0,0,.2)}
-#miniMap{height:280px;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);background:var(--sand)}
+#miniMap{position:relative;z-index:0;isolation:isolate;height:280px;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);background:var(--sand)}
 .side{position:relative}
 .stick{position:sticky;top:18px;display:flex;flex-direction:column;gap:14px}
 .box{background:var(--shell);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px}
@@ -770,7 +770,7 @@ function drawMap(a){
   const pts=[];
   a.filter(x=>x.geo).forEach(x=>{
     const m=L.marker(x.geo,{icon:L.divIcon({className:"pm",html:`<span>${eurS(x.prix)}</span>`,iconSize:[0,0]}),title:x.type+" à "+x.ville,keyboard:true});
-    m.bindPopup(()=>`<div class="pop">${x.photos[0]?`<img src="${esc(x.photos[0])}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:""}<div class="t"><b class="tnum">${eur(x.prix)}</b><div class="c">${esc(x.type)} · ${esc(x.ville)}</div><div class="mini">${[x.surface&&fr(x.surface)+" m²",x.chambres&&x.chambres+" ch.",x.piscine&&"piscine"].filter(Boolean).join(" · ")}</div><button type="button" data-open="${x.id}">Voir la fiche</button></div></div>`,{maxWidth:260,minWidth:240});
+    m.bindPopup(()=>`<div class="mpop">${x.photos[0]?`<img src="${esc(x.photos[0])}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:""}<div class="t"><b class="tnum">${eur(x.prix)}</b><div class="c">${esc(x.type)} · ${esc(x.ville)}</div><div class="mini">${[x.surface&&fr(x.surface)+" m²",x.chambres&&x.chambres+" ch.",x.piscine&&"piscine"].filter(Boolean).join(" · ")}</div><button type="button" data-open="${x.id}">Voir la fiche</button></div></div>`,{maxWidth:260,minWidth:240});
     cluster.addLayer(m);pts.push(x.geo);
   });
   setTimeout(()=>{map.invalidateSize();if(pts.length)map.fitBounds(L.latLngBounds(pts).pad(0.08),{maxZoom:13})},60);
