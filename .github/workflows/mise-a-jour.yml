@@ -1,6 +1,13 @@
 # Sud'perbe : mise à jour automatique des annonces vue mer, puis mise en ligne du site.
 # Passages : 5 h et 17 h UTC (7 h et 19 h à Paris l'été, 6 h et 18 h l'hiver), à la demande (bouton « Run workflow »),
 # et après chaque envoi de fichiers du site (sans passage de Claude dans ce cas).
+#
+# Sécurité : deux étapes séparées.
+#   1. « chercher » : Claude lit le web avec un jeton GitHub en LECTURE SEULE. Il ne peut écrire que dans data/
+#      et ne peut lancer que trois scripts précis. Seuls quatre fichiers de données sortent de cette étape.
+#   2. « publier » : les données sont contrôlées par scripts/verifier.js, puis le site est construit et mis en ligne.
+#      C'est la seule étape qui peut écrire dans le dépôt, et Claude n'y tourne pas.
+# Les actions sont figées sur une version précise (empreinte du commit) pour qu'une mise à jour piégée ne passe pas.
 name: Mise à jour des annonces
 
 on:
@@ -11,56 +18,106 @@ on:
     branches: [main]
     paths: ["site/**", "scripts/**", "data/**", ".github/workflows/**"]
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
+permissions: {}
 
 concurrency:
   group: mise-a-jour
   cancel-in-progress: false
 
 jobs:
-  maj:
+  chercher:
     runs-on: ubuntu-latest
-    timeout-minutes: 70
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      id-token: write
     env:
       AVEC_CLAUDE: ${{ github.event_name != 'push' && secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: env.AVEC_CLAUDE == 'true'
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        if: env.AVEC_CLAUDE == 'true'
         with:
           node-version: 22
 
       - name: Préparer le navigateur pour les photos
         if: env.AVEC_CLAUDE == 'true'
         run: |
-          npm install --no-save --no-audit --no-fund playwright@1
-          npx playwright install --with-deps chromium
-
-      - name: Garder une copie des données
-        run: cp data/biens.json /tmp/avant.json
+          npm install --no-save --no-audit --no-fund --ignore-scripts playwright@1.63.0
+          npx --no-install playwright install --with-deps chromium
 
       - name: Chercher les nouvelles annonces (Claude)
         if: env.AVEC_CLAUDE == 'true'
         continue-on-error: true
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@fd1c128679612beff4ca259c78021c506e8aa7a7 # v1.0.237
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          settings: '{"permissions":{"blockReadsOutsideWorkingDirectories":true}}'
           prompt: "Lis CLAUDE.md et fais la mise à jour des annonces décrite dans « Déroulé d'un passage ». Termine par le résumé demandé."
           claude_args: |
             --model sonnet
             --max-turns 160
-            --allowedTools "WebFetch,WebSearch,Read,Write,Edit,Glob,Grep,Bash(node scripts/*)"
+            --allowedTools "WebFetch,WebSearch,Read,Glob,Grep,Edit(data/**),Bash(node scripts/connus.js),Bash(node scripts/connus.js *),Bash(node scripts/a-verifier.js *),Bash(node scripts/photos.js *),Bash(node scripts/verifier.js --essai)"
+            --disallowedTools "Edit(scripts/**),Edit(site/**),Edit(.github/**),Edit(CLAUDE.md),Edit(data/biens.json),Edit(data/attente.json),Edit(data/etat.json)"
 
-      - name: Annuler toute modification hors du dossier data
+      - name: Garder uniquement les quatre fichiers de données prévus
+        if: env.AVEC_CLAUDE == 'true'
         run: |
-          (git diff --name-only | grep -v '^data/' || true) | xargs -r git checkout --
+          mkdir -p /tmp/sortie
+          for f in nouveaux changements sources communes; do
+            if [ -f "data/$f.json" ] && [ ! -L "data/$f.json" ] && node -e "JSON.parse(require('fs').readFileSync('data/$f.json','utf8'))"; then
+              cp "data/$f.json" "/tmp/sortie/$f.json"
+            fi
+          done
+          ls -la /tmp/sortie
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: env.AVEC_CLAUDE == 'true'
+        with:
+          name: donnees-claude
+          path: /tmp/sortie/
+          retention-days: 2
+          if-no-files-found: ignore
+
+  publier:
+    needs: chercher
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - name: Récupérer le travail de Claude (s'il y en a un)
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        continue-on-error: true
+        with:
+          name: donnees-claude
+          path: /tmp/entree
+
+      - name: Garder une copie des données
+        run: cp data/biens.json /tmp/avant.json
+
+      - name: Déposer les quatre fichiers attendus, et rien d'autre
+        run: |
+          for f in nouveaux changements sources communes; do
+            if [ -f "/tmp/entree/$f.json" ] && [ ! -L "/tmp/entree/$f.json" ]; then cp "/tmp/entree/$f.json" "data/$f.json"; fi
+          done
           git status --short
 
       - name: Vérifier et intégrer les données
@@ -78,15 +135,15 @@ jobs:
         run: |
           git config user.name "sudperbe-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data index.html
+          git add data
           if git diff --cached --quiet; then echo "Rien de nouveau."; else
             git commit -m "Annonces : $(node -e 'console.log(require("./data/etat.json").resume)')"
             git push
           fi
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: _site
       - id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
