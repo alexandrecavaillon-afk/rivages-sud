@@ -1,0 +1,92 @@
+# Sud'perbe : mise à jour automatique des annonces vue mer, puis mise en ligne du site.
+# Passages : 5 h et 17 h UTC (7 h et 19 h à Paris l'été, 6 h et 18 h l'hiver), à la demande (bouton « Run workflow »),
+# et après chaque envoi de fichiers du site (sans passage de Claude dans ce cas).
+name: Mise à jour des annonces
+
+on:
+  schedule:
+    - cron: "0 5,17 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["site/**", "scripts/**", "data/**", ".github/workflows/**"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: mise-a-jour
+  cancel-in-progress: false
+
+jobs:
+  maj:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      AVEC_CLAUDE: ${{ github.event_name != 'push' && secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Préparer le navigateur pour les photos
+        if: env.AVEC_CLAUDE == 'true'
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1
+          npx playwright install --with-deps chromium
+
+      - name: Garder une copie des données
+        run: cp data/biens.json /tmp/avant.json
+
+      - name: Chercher les nouvelles annonces (Claude)
+        if: env.AVEC_CLAUDE == 'true'
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: "Lis CLAUDE.md et fais la mise à jour des annonces décrite dans « Déroulé d'un passage ». Termine par le résumé demandé."
+          claude_args: |
+            --model sonnet
+            --max-turns 160
+            --allowedTools "WebFetch,WebSearch,Read,Write,Edit,Glob,Grep,Bash(node scripts/*)"
+
+      - name: Annuler toute modification hors du dossier data
+        run: |
+          (git diff --name-only | grep -v '^data/' || true) | xargs -r git checkout --
+          git status --short
+
+      - name: Vérifier et intégrer les données
+        run: |
+          if ! node scripts/verifier.js --avant /tmp/avant.json; then
+            echo "::warning::Données refusées par le garde-fou : on garde la version précédente."
+            git checkout -- data/
+            node scripts/verifier.js
+          fi
+
+      - name: Construire le site
+        run: node scripts/build.js
+
+      - name: Enregistrer les données
+        run: |
+          git config user.name "sudperbe-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data index.html
+          if git diff --cached --quiet; then echo "Rien de nouveau."; else
+            git commit -m "Annonces : $(node -e 'console.log(require("./data/etat.json").resume)')"
+            git push
+          fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4
