@@ -1,6 +1,6 @@
 // Garde-fou des données de Sud'perbe.
 //   node scripts/verifier.js --essai          → contrôle data/nouveaux.json et data/changements.json sans rien écrire
-//   node scripts/verifier.js [--avant F.json] → intègre nouveautés et changements dans data/biens.json, nettoie,
+//   node scripts/verifier.js [--avant F.json] [--passage-claude] → intègre nouveautés et changements dans data/biens.json, nettoie,
 //                                               dédoublonne, met en attente les biens sans photo, puis vide les fichiers d'entrée.
 //   Avec --avant, refuse d'écrire si le nombre de biens baisse de plus de 30 % par rapport au fichier F.
 const fs = require('fs');
@@ -11,6 +11,8 @@ const args = process.argv.slice(2);
 const ESSAI = args.includes('--essai');
 const ai = args.indexOf('--avant');
 const AVANT = ai >= 0 ? args[ai + 1] : null;
+// Un essai de photos ne compte que si Claude a vraiment cherché pendant ce passage (option --passage-claude).
+const PASSAGE_CLAUDE = args.includes('--passage-claude');
 const TODAY = C.today();
 const MAX_ESSAIS_PHOTOS = 14; // ≈ une semaine à deux passages par jour
 
@@ -56,7 +58,7 @@ const retirer = new Set(chg.retirer.map(r => r && r.id));
 const outB = [], outA = [];
 function place(f, why) {
   if (why === 'sans photo') {
-    f.essais_photos = (f.essais_photos || 0) + 1;
+    if (PASSAGE_CLAUDE) f.essais_photos = (f.essais_photos || 0) + 1;
     if (f.essais_photos > MAX_ESSAIS_PHOTOS) { R.abandonnes++; return; }
     outA.push(f); return;
   }
