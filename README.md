@@ -2,7 +2,7 @@
 
 **Vue mer, prix mistral.** Site : https://alexandrecavaillon-afk.github.io/rivages-sud/
 
-Toutes les maisons, villas et appartements avec vue mer à vendre qu'on peut lire en ligne, de Menton à Cerbère : photos, fiches détaillées, carte, filtres par équipement.
+Maisons, villas et appartements avec vue mer à vendre sur la côte méditerranéenne française : photos, fiches détaillées, carte, filtres par équipement.
 
 ## Comment il se met à jour
 
@@ -16,4 +16,13 @@ Deux fois par jour (7 h et 19 h à Paris l'été, 6 h et 18 h l'hiver), GitHub l
 
 - `data/biens.json` : les biens en ligne · `data/attente.json` : biens sans photo, retentés à chaque passage pendant une semaine
 - `data/sources.json` : les pages surveillées · `data/communes.json` : positions pour la carte
-- `site/modele.html` : le site · `scripts/build.js` : construit `index.html`
+- `site/modele.html`, `site/style.css`, `site/app.js` : le site · `site/pages/` : mentions légales, confidentialité, conditions, page 404
+- `site/vendor/` et `site/fonts/` : bibliothèques de la carte et polices, hébergées sur le site (versions dans `site/vendor/VERSIONS.md`)
+- `site/lancement.json` : `public` passe à `true` au lancement (le site devient indexable), `domaine` reçoit le nom de domaine
+- `scripts/build.js` : construit le site dans `_site/` (seul ce dossier est mis en ligne)
+
+## Sécurité
+
+- Site statique : pas de serveur, pas de base de données, pas de compte, pas de formulaire, aucune clé dans le code.
+- Politique de sécurité du contenu stricte (aucun script ni style venant d'ailleurs), liens et photos filtrés (`http`/`https` uniquement), textes des annonces nettoyés par `scripts/commun.js`.
+- Dans GitHub Actions, Claude tourne avec un jeton en lecture seule et des droits limités ; seuls quatre fichiers de données passent à l'étape de publication, qui les contrôle avant de construire le site. Actions figées sur l'empreinte de leur version.
