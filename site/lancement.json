@@ -1,0 +1,5 @@
+{
+  "_note": "Avant le lancement : public=false (le site demande à Google de ne pas l'indexer). Au lancement : public=true et domaine=\"ton-domaine.fr\" une fois le domaine relié dans GitHub → Settings → Pages.",
+  "public": false,
+  "domaine": null
+}
